@@ -3,20 +3,34 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/ngkonco/jenkins-docker-lab.git'
+                git branch: 'main', url: 'https://github.com/DickyfliPerdanaPutra/jenkins-docker-lab.git'
             }
         }
         stage('Build Docker Image') {
             steps {
                 when {
-                    changeset "**", exclude: ["README.MD", "docs/**"]
+                not {
+                    anyOf {
+                        changeset pattern: 'README.md', comparator: 'GLOB'
+                        changeset pattern: 'docs/**',  comparator: 'GLOB'
+              }
                 }
+            }
+
                 script {
                     docker.build("jenkins-docker-lab:latest")
                 }
             }
         }
         stage('Run Container') {
+             when {
+    not {
+        anyOf {
+            changeset pattern: 'README.md', comparator: 'GLOB'
+            changeset pattern: 'docs/**',  comparator: 'GLOB'
+ }
+    }
+}
             steps {
                 script {
                     sh 'docker stop flask-app'
