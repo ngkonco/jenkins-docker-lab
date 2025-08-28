@@ -8,6 +8,9 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
+                when {
+                    changeset "**", exclude: ["README.MD", "docs/**"]
+                }
                 script {
                     docker.build("jenkins-docker-lab:latest")
                 }
